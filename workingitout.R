@@ -24,6 +24,7 @@ reviews <- aggregate(ReviewBody ~ Ref, data = data, paste, collapse = ",")
 
 #3 Create wordcloud for given (random, here) T2T
 ref <- sample (reviews$Ref,1)
+# other good refs: 21217 
 refreview <- reviews$ReviewBody[reviews$Ref==ref]
 refreview <- gsub("[[:punct:]]", " ", refreview, except("'")) # regular expression used :)
 refreview <- gsub("null", " ", refreview)
@@ -44,11 +45,15 @@ m = as.matrix(myDTM)
 v = sort(rowSums(m), decreasing = TRUE)
 library(wordcloud)
 pal <- brewer.pal(8,"Dark2")
-set.seed(1234) # for reproducibility
+# set.seed(1234) # for reproducibility
 wordcloud(names(v), v, colors=pal)
 
 # How do I get the data into word,freq format for wordcloud2 visualisations?
 # wordcloud2(myDTM)
+
+
+tdm <- TermDocumentMatrix(vsrefreview, control = list(removePunctuation = TRUE, stopwords = TRUE))
+wordcloud2(tdm)
 
 
 
