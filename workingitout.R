@@ -11,6 +11,7 @@
 # Merging data frames: https://rpubs.com/NateByers/Merging # not actually used this yet
 
 library (wordcloud)
+library (wordcloud2)
 library (tm)
 
 #1 Import and clean
@@ -18,15 +19,15 @@ data <- read.csv("revs_oct17.csv")
 View (data)
 # Need to add in MW hierarchy? (later)
 
-
 #2 Transform by aggregating all reviews into one record per Ref
 reviews <- aggregate(ReviewBody ~ Ref, data = data, paste, collapse = ",")
 
-#3 Create wordcloud for given (random, here) T2T
-ref <- sample (reviews$Ref,1)
-# other good refs: 21217 
+#3 Clean up the data
+# ref <- sample (reviews$Ref,1)
+# other good refs: 21217 21782 
+ref <- 24339
 refreview <- reviews$ReviewBody[reviews$Ref==ref]
-refreview <- gsub("[[:punct:]]", " ", refreview, except("'")) # regular expression used :)
+refreview <- gsub("[[:punct:]]", " ", refreview, except("'"))      # regular expression used :)
 refreview <- gsub("null", " ", refreview)
 refreview <- gsub("NULL", " ", refreview)
 
@@ -40,28 +41,19 @@ vsrefreview = tm_map(vsrefreview, removeWords, stopwords("english"))
 
 inspect(vsrefreview)
 
-myDTM = TermDocumentMatrix(vsrefreview, control = list(minWordLength = 1))
-m = as.matrix(myDTM)
-v = sort(rowSums(m), decreasing = TRUE)
-library(wordcloud)
-pal <- brewer.pal(8,"Dark2")
-# set.seed(1234) # for reproducibility
-wordcloud(names(v), v, colors=pal)
-
 # How do I get the data into word,freq format for wordcloud2 visualisations?
 # wordcloud2(myDTM)
 
-
+# Creates the word, freq list (but in 'TermDocumentMatrix' class - no use for wordcloud2)
 tdm <- TermDocumentMatrix(vsrefreview, control = list(removePunctuation = TRUE, stopwords = TRUE))
+
+# convert from TermDocumentMatrix to data.frame
+tdm <- data.frame(as.matrix(tdm), stringsAsFactors=FALSE)
+
+# The row names are presently not actually a column so they need to be added as one:
+tdm <- cbind(rownames(tdm), tdm)
+
+# Let's plot the wordcloud
+# set.seed(1234)
 wordcloud2(tdm)
-
-
-
-
-
-
-
-
-
-
 
