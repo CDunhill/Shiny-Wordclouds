@@ -1,23 +1,25 @@
 
 if(require(shiny)){
 library(wordcloud2)
+library(tm)
 # Global variables can go here
-n <- 1
-  
+
+ref <- sample (reviews$Ref,1)
+
 # Define the UI
-ui <- bootstrapPage(numericInput('size', 'Size of wordcloud', n), wordcloud2Output('wordcloud2'))
-  
-  
-  # Define the server code
+ui <- bootstrapPage(numericInput('ref', 'Enter T2T code', ref), wordcloud2Output('wordcloud2'))
+
+
+# Define the server code
   server <- function(input, output) {
     output$wordcloud2 <- renderWordcloud2({
-      # wordcloud2(demoFreqC, size=input$size)
+      # wordcloud2(demoFreqC, size=1)
       wordcloud2(demoFreq, size=input$size)
     })
   }
-  # Return a Shiny app object
-  # Sys.setlocale("LC_CTYPE","chs") #if you use Chinese character
-  
-  ## Do not Run!
-  shinyApp(ui = ui, server = server)
+# Return a Shiny app object
+# Sys.setlocale("LC_CTYPE","chs") #if you use Chinese character
+
+## Do not Run!
+shinyApp(ui = ui, server = server)
 }
